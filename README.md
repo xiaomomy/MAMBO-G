@@ -1,4 +1,4 @@
-# RAAG: Ratio Aware Adaptive Guidance
+# MAMBO-G: Magnitude-Aware Mitigation for Boosted Guidance
 
 (Building Now...)
 
