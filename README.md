@@ -101,6 +101,6 @@ If you find this work helpful, please cite our paper:
   author={Zhu, Shangwen and Peng, Qianyu and Shu, Zhilei and others},
   journal={arXiv preprint arXiv:2503.09675},
   year={2025}
-}---
+}
 ```
 <p align="center">Developed by the MAMBO-G Team.</p>
