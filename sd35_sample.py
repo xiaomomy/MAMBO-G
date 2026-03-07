@@ -25,7 +25,7 @@ images = pipe(
     guidance_scale = 7,
     choice = False,
 ).images
-images[0].save("./example_org.png")
+images[0].save("./sd35_org.png")
 
 torch.manual_seed(42)
 images = pipe(
@@ -36,4 +36,4 @@ images = pipe(
     max_guidance = 18, 
     lr_para = 12,  
 ).images
-images[0].save("./example_RAAG.png")
+images[0].save("./sd35_mambo_g.png")

@@ -14,12 +14,13 @@
     </a> -->
 </p>
 
-**MAMBO-G** is a **training-free**, universal acceleration framework for Classifier-Free Guidance (CFG). By dynamically optimizing guidance magnitudes based on the update-to-prediction ratio, **MAMBO-G** achieves up to **3.0× speedup** on image models (SD3.5, Lumina) and **2.0× speedup** on the Wan2.1-14B video model, all while preserving high visual fidelity.
+**MAMBO-G** is a **training-free**, universal acceleration framework for Classifier-Free Guidance (CFG). By dynamically optimizing guidance magnitudes based on the update-to-prediction ratio, **MAMBO-G** achieves up to **3.0× speedup** on image models (SD3.5, Lumina, Qwen-Image) and **2.0× speedup** on the Wan2.1-14B video model, all while preserving high visual fidelity.
 
 ---
 
 ## 🚀 News
 - **[2026-02]** :tada: **MAMBO-G has been officially merged into the [Hugging Face Diffusers](https://github.com/huggingface/diffusers) library!** You can now use our method natively via the standard library. [Check PR #12862](https://github.com/huggingface/diffusers/pull/12862).
+- **[2025-08]** 🎉 **MAMBO-G now supports [Qwen/Qwen-Image](https://huggingface.co/Qwen/Qwen-Image)!** Achieve state-of-the-art text rendering and image generation with 3x speedup.
 - **[2025-08]** Preprint paper is available on [arXiv](https://arxiv.org/abs/2508.03442v2).
 
 ---
@@ -42,7 +43,7 @@ During the early steps of the reverse diffusion process, the **relative magnitud
 
 ## ✨ Key Features
 - **Plug-and-Play**: No training or fine-tuning required. Works with any pre-trained flow-matching model.
-- **Extreme Efficiency**: 2x-4x speedup across SD3.5, Lumina, and Wan2.1-14B.
+- **Extreme Efficiency**: 2x-4x speedup across SD3.5, Lumina, Qwen-Image, and Wan2.1-14B.
 - **Official Support**: Natively integrated into the `diffusers` ecosystem.
 
 ---
@@ -50,12 +51,17 @@ During the early steps of the reverse diffusion process, the **relative magnitud
 ## 🛠️ Quick Start
 
 ### Installation
-```
+```bash
 git clone https://github.com/your-username/MAMBO-G.git
 cd MAMBO-G
-pip install -r requirements.txt### Usage (Integrated in Diffusers)
-With the official integration, accelerating your pipeline is as simple as enabling the `mambo_g` flag:
+pip install -r requirements.txt
+```
 
+### Usage (Integrated in Diffusers)
+With the official integration, accelerating your pipeline is as simple as enabling the `mambo_g_enabled` flag.
+
+#### 1. Stable Diffusion 3.5
+```python
 import torch
 from diffusers import StableDiffusion3Pipeline
 
@@ -73,15 +79,39 @@ image = pipe(
     max_guidance=18.0, 
     lr_para=12.0
 ).images[0]
-
-image.save("accelerated_result.png")---
 ```
+
+#### 2. Qwen-Image
+```python
+from diffusers import DiffusionPipeline
+import torch
+
+pipe = DiffusionPipeline.from_pretrained("Qwen/Qwen-Image", torch_dtype=torch.bfloat16).to("cuda")
+
+# MAMBO-G Accelerated Sampling (Only 15 steps for complex text rendering!)
+image = pipe(
+    prompt="A coffee shop entrance with a sign 'Qwen Coffee 😊 $2 per cup'",
+    num_inference_steps=15, 
+    mambo_g_enabled=True,
+    max_guidance=18.0, 
+    lr_para=12.0
+).images[0]
+```
+
+### Example Scripts
+We provide ready-to-use scripts for evaluating MAMBO-G:
+- `sd35_sample.py`: Compare Original vs MAMBO-G for SD3.5.
+- `qwen_sample.py`: Compare Original vs MAMBO-G for Qwen-Image.
+- `qwen_mambo_g.py`: Specialized acceleration script for Qwen-Image.
+
+---
 
 ## 📊 Performance Benchmark
 
 | Model | Task | Baseline Steps | MAMBO-G Steps | Speedup |
 | :--- | :--- | :---: | :---: | :---: |
 | **Stable Diffusion 3.5** | T2I | 30 | 10 | **3.0×** |
+| **Qwen-Image** | T2I | 50 | 15 | **3.3×** |
 | **Lumina-Next** | T2I | 40 | 10 | **4.0×** |
 | **Wan2.1 (14B)** | T2V | 30 | 15 | **2.0×** |
 
