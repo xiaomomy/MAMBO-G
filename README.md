@@ -9,6 +9,9 @@
     <a href="https://arxiv.org/abs/2508.03442v2">
         <img src="https://img.shields.io/badge/arXiv-2503.09675-b31b1b.svg" alt="arXiv">
     </a>
+    <a href="https://matrixteam-ai.github.io/MatrixTeam-OmniVeritas/blog/mambo-g/">
+        <img src="https://img.shields.io/badge/Project%20Homepage-MatrixTeam--OmniVeritas-purple?logo=matrix" alt="Project Homepage">
+    </a>
     <!-- <a href="https://github.com/your-username/MAMBO-G/blob/main/LICENSE">
         <img src="https://img.shields.io/badge/License-Apache--2.0-green.svg" alt="License">
     </a> -->
@@ -27,11 +30,29 @@
 
 ## 💡 Why MAMBO-G?
 
-During the early steps of the reverse diffusion process, the **relative magnitude** between conditional and unconditional predictions peaks sharply. Standard CFG uses a fixed scale, which leads to:
-1. **Trajectory Instability**: High sensitivity in early sampling phases.
-2. **Redundant Computation**: Requiring more NFEs (steps) to correct path deviations.
+### Instability at High Guidance
+We observe that Classifier-Free Guidance (CFG) is a crucial technique for text-to-image and text-to-video generation. However, as we scale up modern diffusion and flow-matching models (e.g., SD3.5, Lumina, WAN2.1), we notice that simply boosting the guidance scale often backfires. The generation process collapses, yielding images with **oversaturated colors, unnatural high-contrast artifacts, and structural disintegration**. We identify this instability not as a random error, but as a systematic failure mode in high-dimensional latent spaces.
 
-**MAMBO-G** addresses this by modulating the guidance scale adaptive to the magnitude ratio, effectively stabilizing the trajectory and enabling rapid convergence.
+### The "Overshoot" Phenomenon: A Geometric Perspective
+Why does strong guidance fail? We trace the root cause to the initialization phase (Zero-SNR, $t=1$). 
+1. **Generic Direction at Initialization**: We find that at $t=1$, the input is pure Gaussian noise, meaning it is statistically independent of the target data. Consequently, the model's guidance update vector ($\Delta \mathbf{v}$) relies *solely* on the text prompt, completely ignoring the specific structure of the initial noise.
+2. **The Conflict**: Empirically, we observe that the guidance direction is nearly identical (Cosine Similarity $\approx 1.0$) across different random seeds at this initial stage. This indicates that the guidance pushes *every* sample in the exact same "generic" direction.
+3. **Manifold Deviation**: In high-dimensional latent spaces, we note that applying a large guidance scale to this generic vector forces the generation trajectory to move aggressively along a path that likely diverges from the optimal path to the data manifold. We term this severe deviation an **"overshoot"**, which drives the state into invalid regions from which the model cannot recover.
+
+### The MAMBO-G Solution
+To address this "blind" generic guidance, we propose a magnitude-aware adaptive strategy that temporarily dampens the guidance scale when the risk of overshoot is high. We define a **Magnitude-Aware Ratio ($r_t$)**:
+
+$$ r_t(\mathbf{x}_t, t) = \frac{\|\mathbf{v}_{\text{cond}}(\mathbf{x}_t, t) - \mathbf{v}_{\text{uncond}}(\mathbf{x}_t, t)\|}{\|\mathbf{v}_{\text{uncond}}(\mathbf{x}_t, t)\|} $$
+
+We interpret this ratio as a **Coefficient of Variation (CV)** for the diffusion process. It quantifies the relative magnitude of the guidance update (the "variation") with respect to the unconditional prediction (the "mean"). We conclude that a high coefficient implies the guidance force is overwhelming the intrinsic denoising direction, signaling a potential risk of overshoot.
+
+Based on this ratio, we apply an adaptive damping factor to the guidance scale:
+
+$$ w(r_t) = 1 + w_{\max} \cdot \exp(-\alpha r_t) $$
+
+This mechanism ensures that we safely suppress the guidance when the risk is high (typically at the very beginning of sampling) and dynamically restore it as the image structure becomes clearer. 
+
+*For more theoretical details and comprehensive visual comparisons, we invite you to visit our [Project Homepage](https://matrixteam-ai.github.io/MatrixTeam-OmniVeritas/blog/mambo-g/).*
 
 <div align="center">
   <img src="figures/head_display.png" alt="MAMBO-G Comparison" width="100%">
@@ -58,44 +79,32 @@ pip install -r requirements.txt
 ```
 
 ### Usage (Integrated in Diffusers)
-With the official integration, accelerating your pipeline is as simple as enabling the `mambo_g_enabled` flag.
+With the official integration, accelerating your pipeline is as simple as injecting the `MagnitudeAwareGuidance` component.
 
-#### 1. Stable Diffusion 3.5
+#### 1. Qwen-Image (via Modular Pipeline)
 ```python
 import torch
-from diffusers import StableDiffusion3Pipeline
+from diffusers.modular_pipelines import SequentialPipelineBlocks
+from diffusers.modular_pipelines.qwenimage import TEXT2IMAGE_BLOCKS
+from diffusers.guiders import MagnitudeAwareGuidance
 
-pipe = StableDiffusion3Pipeline.from_pretrained(
-    "stabilityai/stable-diffusion-3.5-large", 
-    torch_dtype=torch.bfloat16
-).to("cuda")
+blocks = SequentialPipelineBlocks.from_blocks_dict(TEXT2IMAGE_BLOCKS)
+pipeline = blocks.init_pipeline("YiYiXu/QwenImage-modular")
+pipeline.load_components(torch_dtype=torch.bfloat16)
+pipeline.to("cuda")
 
-# MAMBO-G Accelerated Sampling (Only 10 steps!)
-image = pipe(
-    "a photo of an astronaut riding a horse on the moon", 
-    num_inference_steps=10, 
-    guidance_scale=7.0,
-    mambo_g_enabled=True,   # Enabled via our official integration
-    max_guidance=18.0, 
-    lr_para=12.0
-).images[0]
-```
+# Enable MAMBO-G Accelerated Sampling
+guider = MagnitudeAwareGuidance(guidance_scale=10.0, alpha=8.0, guidance_rescale=1.0)
+pipeline.update_components(guider=guider)
 
-#### 2. Qwen-Image
-```python
-from diffusers import DiffusionPipeline
-import torch
-
-pipe = DiffusionPipeline.from_pretrained("Qwen/Qwen-Image", torch_dtype=torch.bfloat16).to("cuda")
-
-# MAMBO-G Accelerated Sampling (Only 15 steps for complex text rendering!)
-image = pipe(
+image = pipeline(
     prompt="A coffee shop entrance with a sign 'Qwen Coffee 😊 $2 per cup'",
-    num_inference_steps=15, 
-    mambo_g_enabled=True,
-    max_guidance=18.0, 
-    lr_para=12.0
-).images[0]
+    width=1328, 
+    height=1328,
+    output="images", 
+    num_inference_steps=10, 
+    generator=torch.Generator("cuda").manual_seed(42)
+)[0]
 ```
 
 ### Example Scripts

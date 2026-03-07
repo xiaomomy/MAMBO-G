@@ -1,14 +1,18 @@
 import torch
-from diffusers import DiffusionPipeline
+from diffusers.modular_pipelines import SequentialPipelineBlocks
+from diffusers.modular_pipelines.qwenimage import TEXT2IMAGE_BLOCKS
+from diffusers.guiders import MagnitudeAwareGuidance, ClassifierFreeGuidance
 
-MODEL_NAME = "Qwen/Qwen-Image"
-OUTPUT_SIZE = (1664, 928)
+MODEL_REPO = "YiYiXu/QwenImage-modular"
+OUTPUT_SIZE = (1328, 1328)
 STEPS = 10
 
 
 def build_pipeline(device: str, dtype):
     """Construct the pipeline and send it to the target device."""
-    pipeline = DiffusionPipeline.from_pretrained(MODEL_NAME, torch_dtype=dtype)
+    blocks = SequentialPipelineBlocks.from_blocks_dict(TEXT2IMAGE_BLOCKS)
+    pipeline = blocks.init_pipeline(MODEL_REPO)
+    pipeline.load_components(torch_dtype=dtype)
     return pipeline.to(device)
 
 
@@ -16,27 +20,27 @@ def generate_image(
     pipeline,
     device: str,
     prompt: str,
-    negative_prompt: str,
     steps: int,
     mambo_g_enabled: bool,
 ):
     """Run a single inference pass with or without MAMBO-G enabled."""
     generator = torch.Generator(device=device).manual_seed(42)
-    config = dict(
+    
+    if mambo_g_enabled:
+        guider = MagnitudeAwareGuidance(guidance_scale=10.0, alpha=8.0, guidance_rescale=1.0)
+    else:
+        guider = ClassifierFreeGuidance(guidance_scale=4.0)
+        
+    pipeline.update_components(guider=guider)
+
+    return pipeline(
         prompt=prompt,
-        negative_prompt=negative_prompt,
         width=OUTPUT_SIZE[0],
         height=OUTPUT_SIZE[1],
+        output="images",
         num_inference_steps=steps,
-        true_cfg_scale=4.0,
         generator=generator,
-        mambo_g_enabled=mambo_g_enabled,
-    )
-
-    if mambo_g_enabled:
-        config.update(max_guidance=18.0, lr_para=12.0)
-
-    return pipeline(**config).images[0]
+    )[0]
 
 
 def main():
@@ -53,14 +57,12 @@ def main():
         '"π≈3.1415926-53589793-23846264-33832795-02384197".'
     )
     full_prompt = base_prompt + ", Ultra HD, 4K, cinematic composition."
-    negative_prompt = ""
 
     print("Running baseline generation (Original method).")
     baseline_image = generate_image(
         pipeline,
         device,
         full_prompt,
-        negative_prompt,
         STEPS,
         mambo_g_enabled=False,
     )
@@ -71,7 +73,6 @@ def main():
         pipeline,
         device,
         full_prompt,
-        negative_prompt,
         STEPS,
         mambo_g_enabled=True,
     )
