@@ -118,30 +118,12 @@ We provide ready-to-use scripts for evaluating MAMBO-G:
   <table border="0">
     <tr>
       <td align="center">
-        <a href="figures/SD35_CLIPScore_comparison.pdf">
-          <img src="figures/SD35_CLIPScore_comparison.pdf" width="400px" alt="SD35 CLIPScore Comparison"><br>
-          <b>SD3.5 CLIPScore Comparison</b>
-        </a>
+        <img src="figures/sd35_results.png" width="400px" alt="Stable Diffusion 3.5 Benchmarks"><br>
+        <b>SD3.5 Comparison Results</b>
       </td>
       <td align="center">
-        <a href="figures/SD35_ImageReward_comparison.pdf">
-          <img src="figures/SD35_ImageReward_comparison.pdf" width="400px" alt="SD35 ImageReward Comparison"><br>
-          <b>SD3.5 ImageReward Comparison</b>
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td align="center">
-        <a href="figures/UniPC_Aesthetic_Quality_comparison.pdf">
-          <img src="figures/UniPC_Aesthetic_Quality_comparison.pdf" width="400px" alt="UniPC Aesthetic Quality Comparison"><br>
-          <b>Wan2.1 Aesthetic Quality Comparison</b>
-        </a>
-      </td>
-      <td align="center">
-        <a href="figures/UniPC_Imaging_Quality_comparison.pdf">
-          <img src="figures/UniPC_Imaging_Quality_comparison.pdf" width="400px" alt="UniPC Imaging Quality Comparison"><br>
-          <b>Wan2.1 Imaging Quality Comparison</b>
-        </a>
+        <img src="figures/wan_results.png" width="400px" alt="Wan2.1 (14B) Benchmarks"><br>
+        <b>Wan2.1 Comparison Results</b>
       </td>
     </tr>
   </table>
