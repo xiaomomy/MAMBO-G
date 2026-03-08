@@ -115,18 +115,11 @@ We provide ready-to-use scripts for evaluating MAMBO-G:
 ## 📊 Performance Benchmark
 
 <div align="center">
-  <table border="0">
-    <tr>
-      <td align="center">
-        <img src="figures/sd35_results.png" width="400px" alt="Stable Diffusion 3.5 Benchmarks"><br>
-        <b>SD3.5 Comparison Results</b>
-      </td>
-      <td align="center">
-        <img src="figures/wan_results.png" width="400px" alt="Wan2.1 (14B) Benchmarks"><br>
-        <b>Wan2.1 Comparison Results</b>
-      </td>
-    </tr>
-  </table>
+  <img src="figures/sd35_results.png" width="800px" alt="Stable Diffusion 3.5 Benchmarks"><br>
+  <b>SD3.5 Comparison Results</b>
+  <br><br>
+  <img src="figures/wan_results.png" width="800px" alt="Wan2.1 (14B) Benchmarks"><br>
+  <b>Wan2.1 Comparison Results</b>
 </div>
 
 ---
