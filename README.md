@@ -125,7 +125,16 @@ We provide ready-to-use scripts for evaluating MAMBO-G:
 ---
 
 ## 🖼️ Visual Gallery
-*(Optional: Add more high-quality result comparisons here)*
+
+We provide additional high-quality generation results below to further demonstrate the robustness and fidelity of MAMBO-G across diverse artistic styles and prompts.
+
+<div align="center">
+  <img src="figures/example_fish.png" width="800px" alt="Visual Example 1"><br>
+  <em></em>
+  <br><br>
+  <img src="figures/example_witch.png" width="800px" alt="Visual Example 2"><br>
+  <em></em>
+</div>
 
 ---
 
