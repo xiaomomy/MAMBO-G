@@ -52,8 +52,6 @@ $$ w(r_t) = 1 + w_{\max} \cdot \exp(-\alpha r_t) $$
 
 This mechanism ensures that we safely suppress the guidance when the risk is high (typically at the very beginning of sampling) and dynamically restore it as the image structure becomes clearer. 
 
-*For more theoretical details and comprehensive visual comparisons, we invite you to visit our [Project Homepage](https://matrixteam-ai.github.io/MatrixTeam-OmniVeritas/blog/mambo-g/).*
-
 <div align="center">
   <img src="figures/head_display.png" alt="MAMBO-G Comparison" width="100%">
   <br>
@@ -111,7 +109,6 @@ image = pipeline(
 We provide ready-to-use scripts for evaluating MAMBO-G:
 - `sd35_sample.py`: Compare Original vs MAMBO-G for SD3.5.
 - `qwen_sample.py`: Compare Original vs MAMBO-G for Qwen-Image.
-- `qwen_mambo_g.py`: Specialized acceleration script for Qwen-Image.
 
 ---
 
@@ -137,9 +134,8 @@ If you find this work helpful, please cite our paper:
 ```
 @article{zhu2025mambo,
   title={MAMBO-G: Magnitude-Aware Mitigation for Boosted Guidance},
-  author={Zhu, Shangwen and Peng, Qianyu and Shu, Zhilei and others},
-  journal={arXiv preprint arXiv:2503.09675},
+  author={Zhu, Shangwen and Peng, Qianyu and Shu, Zhilei and Hu, Yuting and Yang, Zhantao and Zhang, Han and Pu, Zhao and Zheng, Andy and Cui, Xinyu and Zhao, Jian and others},
+  journal={arXiv preprint arXiv:2508.03442},
   year={2025}
 }
 ```
-<p align="center">Developed by the MAMBO-G Team.</p>
