@@ -37,12 +37,12 @@ Classifier-Free Guidance (CFG) is a crucial technique for text-to-image and text
 Why does strong guidance fail? We trace the root cause to the initialization phase (Zero-SNR, $t=1$). 
 1. **Generic Direction at Initialization**: We find that at $t=1$, the input is pure Gaussian noise, meaning it is statistically independent of the target data. Consequently, the model's guidance update vector ($\Delta \mathbf{v}$) relies *solely* on the text prompt, completely ignoring the specific structure of the initial noise.
 2. **The Conflict**: Empirically, we observe that the guidance direction is nearly identical (Cosine Similarity $\approx 1.0$) across different random seeds at this initial stage. This indicates that the guidance pushes *every* sample in the exact same "generic" direction.
-3. **Manifold Deviation**: In high-dimensional latent spaces, we note that applying a large guidance scale to this generic vector forces the generation trajectory to move aggressively along a path that likely diverges from the optimal path to the data manifold. We term this severe deviation an **"overshoot"**, which drives the state into invalid regions from which the model cannot recover.
+3. **Manifold Deviation**: In high-dimensional latent spaces, we note that applying a large guidance scale to this generic vector forces the generation trajectory to move aggressively along a path that likely diverges from the optimal path to the data manifold. We term this severe deviation an **"overshoot"**, which drives the state into invalid regions from which the model cannot recover easily.
 
 ### The MAMBO-G Solution
 To address this "blind" generic guidance, we propose a magnitude-aware adaptive strategy that temporarily dampens the guidance scale when the risk of overshoot is high. We define a **Magnitude-Aware Ratio ($r_t$)**:
 
-$$ r_t(\mathbf{x}_t, t) = \frac{\|\mathbf{v}_{\text{cond}}(\mathbf{x}_t, t) - \mathbf{v}_{\text{uncond}}(\mathbf{x}_t, t)\|}{\|\mathbf{v}_{\text{uncond}}(\mathbf{x}_t, t)\|} $$
+$$ r_t(\mathbf{x}_t, t) = \frac{\|\|\mathbf{v}_{\text{cond}}(\mathbf{x}_t, t) - \mathbf{v}_{\text{uncond}}(\mathbf{x}_t, t)\|\|_2}{\|\|\mathbf{v}_{\text{uncond}}(\mathbf{x}_t, t)\|\|_2} $$
 
 We interpret this ratio as a **Coefficient of Variation (CV)** for the diffusion process. It quantifies the relative magnitude of the guidance update (the "variation") with respect to the unconditional prediction (the "mean"). We conclude that a high coefficient implies the guidance force is overwhelming the intrinsic denoising direction, signaling a potential risk of overshoot.
 
