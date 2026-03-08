@@ -3,37 +3,67 @@ from diffusers.modular_pipelines import SequentialPipelineBlocks
 from diffusers.modular_pipelines.qwenimage import TEXT2IMAGE_BLOCKS
 from diffusers.guiders import MagnitudeAwareGuidance, ClassifierFreeGuidance
 
-MODEL_REPO = "YiYiXu/QwenImage-modular"
+# Model configuration
+MODEL_REPO_ID = "YiYiXu/QwenImage-modular"
 OUTPUT_SIZE = (1328, 1328)
 STEPS = 10
+SEED = 1
 
 
-def build_pipeline(device: str, dtype):
-    """Construct the pipeline and send it to the target device."""
+def build_pipeline(device: str, dtype: torch.dtype):
+    """
+    Construct the modular pipeline for Qwen-Image.
+    
+    Args:
+        device (str): Device to run the model on (e.g., 'cuda').
+        dtype (torch.dtype): Torch data type for model weights.
+    
+    Returns:
+        The initialized pipeline.
+    """
     blocks = SequentialPipelineBlocks.from_blocks_dict(TEXT2IMAGE_BLOCKS)
-    pipeline = blocks.init_pipeline(MODEL_REPO)
+    pipeline = blocks.init_pipeline(MODEL_REPO_ID)
     pipeline.load_components(torch_dtype=dtype)
     return pipeline.to(device)
 
 
-def generate_image(
+def generate_and_save(
     pipeline,
     device: str,
     prompt: str,
     steps: int,
     mambo_g_enabled: bool,
+    filename: str,
 ):
-    """Run a single inference pass with or without MAMBO-G enabled."""
-    generator = torch.Generator(device=device).manual_seed(42)
+    """
+    Execute inference with specified guidance and save the resulting image.
     
+    Args:
+        pipeline: The initialized pipeline object.
+        device (str): Inference device.
+        prompt (str): Text prompt for generation.
+        steps (int): Number of inference steps.
+        mambo_g_enabled (bool): Whether to use Magnitude-Aware Guidance.
+        filename (str): Path to save the output image.
+    """
+    generator = torch.Generator(device).manual_seed(SEED)
+    
+    # Select guider based on method
     if mambo_g_enabled:
-        guider = MagnitudeAwareGuidance(guidance_scale=10.0, alpha=8.0, guidance_rescale=1.0)
+        # Optimized parameters for MAMBO-G
+        guider = MagnitudeAwareGuidance(
+            guidance_scale=10.0, 
+            alpha=8.0, 
+            guidance_rescale=1.0
+        )
     else:
+        # Standard Classifier-Free Guidance
         guider = ClassifierFreeGuidance(guidance_scale=4.0)
         
     pipeline.update_components(guider=guider)
 
-    return pipeline(
+    # Run inference
+    image = pipeline(
         prompt=prompt,
         width=OUTPUT_SIZE[0],
         height=OUTPUT_SIZE[1],
@@ -41,44 +71,51 @@ def generate_image(
         num_inference_steps=steps,
         generator=generator,
     )[0]
+    
+    image.save(filename)
 
 
 def main():
-    """Invoke both baseline and MAMBO-G generations for comparison."""
+    """
+    Compare Baseline vs MAMBO-G on Qwen-Image using the official comic portrait prompt.
+    """
     device = "cuda" if torch.cuda.is_available() else "cpu"
     dtype = torch.bfloat16 if torch.cuda.is_available() else torch.float32
     pipeline = build_pipeline(device, dtype)
 
-    base_prompt = (
-        'A coffee shop entrance features a chalkboard sign reading '
-        '"Qwen Coffee 😊 $2 per cup," with a neon light beside it displaying '
-        '"通义千问". Next to it hangs a poster showing a beautiful Chinese '
-        'woman, and beneath the poster is written '
-        '"π≈3.1415926-53589793-23846264-33832795-02384197".'
+    # Official prompt from the blog example
+    prompt = (
+        "a comic potrait of a female necromancer with big and cute eyes, fine - face, "
+        "realistic shaded perfect face, fine details. night setting. very anime style. "
+        "realistic shaded lighting poster by ilya kuvshinov katsuhiro, magali villeneuve, "
+        "artgerm, jeremy lipkin and michael garmash, rob rey and kentaro miura style, "
+        "trending on art station"
     )
-    full_prompt = base_prompt + ", Ultra HD, 4K, cinematic composition."
 
-    print("Running baseline generation (Original method).")
-    baseline_image = generate_image(
+    # 1. Baseline Generation (Original method)
+    print(f"Running baseline generation ({STEPS} steps)...")
+    generate_and_save(
         pipeline,
         device,
-        full_prompt,
+        prompt,
         STEPS,
         mambo_g_enabled=False,
+        filename=f"t2v_original_{STEPS}_steps.png"
     )
-    baseline_image.save("qwen_org.png")
 
-    print("Running MAMBO-G accelerated generation.")
-    mambo_image = generate_image(
+    # 2. MAMBO-G Generation (Accelerated method)
+    print(f"Running MAMBO-G accelerated generation ({STEPS} steps)...")
+    generate_and_save(
         pipeline,
         device,
-        full_prompt,
+        prompt,
         STEPS,
         mambo_g_enabled=True,
+        filename=f"t2v_mambo_{STEPS}_steps.png"
     )
-    mambo_image.save("qwen_mambo_g.png")
 
-    print("Generation complete! Results saved as 'qwen_org.png' and 'qwen_mambo_g.png'.")
+    print(f"Generation complete! Results saved as 't2v_original_{STEPS}_steps.png' "
+          f"and 't2v_mambo_{STEPS}_steps.png'.")
 
 
 if __name__ == "__main__":
