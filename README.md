@@ -1,7 +1,5 @@
 # MAMBO-G: Magnitude-Aware Mitigation for Boosted Guidance
 
-(Building now...)
-
 <p align="center">
     <a href="https://github.com/huggingface/diffusers/pull/12862">
         <img src="https://img.shields.io/badge/Official%20Integration-Diffusers-blue?logo=huggingface" alt="Diffusers Integration">
@@ -25,7 +23,7 @@
   <br>
   <img src="figures/head_display_video.png" alt="MAMBO-G Video Comparison" width="100%">
   <br>
-  <em>Superior efficiency of MAMBO-G: Our method achieves comparable quality to standard CFG generation while achieving 3.0× speedup for images (20-NFE vs 60-NFE) and 2.0× speedup for videos (30-NFE vs 60-NFE).</em>
+  <em>Superior efficiency of MAMBO-G: Our method achieves comparable quality to 60-NFE (30-step) CFG image generation with only 20 NFE (10 steps), demonstrating a 3.0× speedup over the standard CFG sampling.</em>
 </div>
 
 ---
