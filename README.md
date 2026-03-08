@@ -53,9 +53,9 @@ $$ w(r_t) = 1 + w_{\max} \cdot \exp(-\alpha r_t) $$
 This mechanism ensures that we safely suppress the guidance when the risk is high (typically at the very beginning of sampling) and dynamically restore it as the image structure becomes clearer. 
 
 <div align="center">
-  <img src="figures/head_display.png" alt="MAMBO-G Comparison" width="100%">
+  <img src="figures/head_display_new.png" alt="MAMBO-G Comparison" width="100%">
   <br>
-  <em>Results on SD3.5 and Lumina-Next. Left: 10-step Baseline. Middle: 30-step Baseline. Right: <b>10-step MAMBO-G (Matches 30-step quality with 3x speedup)</b>.</em>
+  <em>Superior efficiency of MAMBO-G: Our method achieves comparable quality to 60-NFE (30-step) CFG image generation with only 20 NFE (10 steps), demonstrating a 3.0× speedup over the standard CFG sampling.</b></em>
 </div>
 
 ---
