@@ -114,12 +114,38 @@ We provide ready-to-use scripts for evaluating MAMBO-G:
 
 ## 📊 Performance Benchmark
 
-| Model | Task | Baseline Steps | MAMBO-G Steps | Speedup |
-| :--- | :--- | :---: | :---: | :---: |
-| **Stable Diffusion 3.5** | T2I | 30 | 10 | **3.0×** |
-| **Qwen-Image** | T2I | 50 | 15 | **3.3×** |
-| **Lumina-Next** | T2I | 40 | 10 | **4.0×** |
-| **Wan2.1 (14B)** | T2V | 30 | 15 | **2.0×** |
+<div align="center">
+  <table border="0">
+    <tr>
+      <td align="center">
+        <a href="figures/SD35_CLIPScore_comparison.pdf">
+          <img src="figures/SD35_CLIPScore_comparison.pdf" width="400px" alt="SD35 CLIPScore Comparison"><br>
+          <b>SD3.5 CLIPScore Comparison</b>
+        </a>
+      </td>
+      <td align="center">
+        <a href="figures/SD35_ImageReward_comparison.pdf">
+          <img src="figures/SD35_ImageReward_comparison.pdf" width="400px" alt="SD35 ImageReward Comparison"><br>
+          <b>SD3.5 ImageReward Comparison</b>
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <a href="figures/UniPC_Aesthetic_Quality_comparison.pdf">
+          <img src="figures/UniPC_Aesthetic_Quality_comparison.pdf" width="400px" alt="UniPC Aesthetic Quality Comparison"><br>
+          <b>Wan2.1 Aesthetic Quality Comparison</b>
+        </a>
+      </td>
+      <td align="center">
+        <a href="figures/UniPC_Imaging_Quality_comparison.pdf">
+          <img src="figures/UniPC_Imaging_Quality_comparison.pdf" width="400px" alt="UniPC Imaging Quality Comparison"><br>
+          <b>Wan2.1 Imaging Quality Comparison</b>
+        </a>
+      </td>
+    </tr>
+  </table>
+</div>
 
 ---
 
