@@ -19,6 +19,12 @@
 
 **MAMBO-G** is a **training-free**, universal acceleration framework for Classifier-Free Guidance (CFG). By dynamically optimizing guidance magnitudes based on the update-to-prediction ratio, **MAMBO-G** achieves up to **3.0× speedup** on image models (SD3.5, Lumina, Qwen-Image) and **2.0× speedup** on the Wan2.1-14B video model, all while preserving high visual fidelity.
 
+<div align="center">
+  <img src="figures/head_display_new.png" alt="MAMBO-G Comparison" width="100%">
+  <br>
+  <em>Superior efficiency of MAMBO-G: Our method achieves comparable quality to 60-NFE (30-step) CFG image generation with only 20 NFE (10 steps), demonstrating a 3.0× speedup over the standard CFG sampling.</b></em>
+</div>
+
 ---
 
 ## 🚀 News
@@ -51,12 +57,6 @@ Based on this ratio, we apply an adaptive damping factor to the guidance scale:
 $$ w(r_t) = 1 + w_{\max} \cdot \exp(-\alpha r_t) $$
 
 This mechanism ensures that we safely suppress the guidance when the risk is high (typically at the very beginning of sampling) and dynamically restore it as the image structure becomes clearer. 
-
-<div align="center">
-  <img src="figures/head_display_new.png" alt="MAMBO-G Comparison" width="100%">
-  <br>
-  <em>Superior efficiency of MAMBO-G: Our method achieves comparable quality to 60-NFE (30-step) CFG image generation with only 20 NFE (10 steps), demonstrating a 3.0× speedup over the standard CFG sampling.</b></em>
-</div>
 
 ---
 
