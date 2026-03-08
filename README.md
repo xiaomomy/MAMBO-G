@@ -6,8 +6,8 @@
     <a href="https://github.com/huggingface/diffusers/pull/12862">
         <img src="https://img.shields.io/badge/Official%20Integration-Diffusers-blue?logo=huggingface" alt="Diffusers Integration">
     </a>
-    <a href="https://arxiv.org/abs/2508.03442v2">
-        <img src="https://img.shields.io/badge/arXiv-2503.09675-b31b1b.svg" alt="arXiv">
+    <a href="https://arxiv.org/abs/2508.03442v4">
+        <img src="https://img.shields.io/badge/arXiv-2508.03442-b31b1b.svg" alt="arXiv">
     </a>
     <a href="https://matrixteam-ai.github.io/MatrixTeam-OmniVeritas/blog/mambo-g/">
         <img src="https://img.shields.io/badge/Project%20Homepage-MatrixTeam--OmniVeritas-purple?logo=matrix" alt="Project Homepage">
@@ -24,14 +24,14 @@
 ## 🚀 News
 - **[2026-02]** :tada: **MAMBO-G has been officially merged into the [Hugging Face Diffusers](https://github.com/huggingface/diffusers) library!** You can now use our method natively via the standard library. [Check PR #12862](https://github.com/huggingface/diffusers/pull/12862).
 - **[2025-08]** 🎉 **MAMBO-G now supports [Qwen/Qwen-Image](https://huggingface.co/Qwen/Qwen-Image)!** Achieve state-of-the-art text rendering and image generation with 3x speedup.
-- **[2025-08]** Preprint paper is available on [arXiv](https://arxiv.org/abs/2508.03442v2).
+- **[2025-08]** Preprint paper is available on [arXiv](https://arxiv.org/abs/2508.03442v4).
 
 ---
 
 ## 💡 Why MAMBO-G?
 
 ### Instability at High Guidance
-We observe that Classifier-Free Guidance (CFG) is a crucial technique for text-to-image and text-to-video generation. However, as we scale up modern diffusion and flow-matching models (e.g., SD3.5, Lumina, WAN2.1), we notice that simply boosting the guidance scale often backfires. The generation process collapses, yielding images with **oversaturated colors, unnatural high-contrast artifacts, and structural disintegration**. We identify this instability not as a random error, but as a systematic failure mode in high-dimensional latent spaces.
+Classifier-Free Guidance (CFG) is a crucial technique for text-to-image and text-to-video generation. However, as we scale up modern diffusion and flow-matching models (e.g., SD3.5, WAN2.1), we notice that simply boosting the guidance scale often backfires. The generation process collapses, yielding images with **oversaturated colors, unnatural high-contrast artifacts, and structural disintegration**. We identify this instability not as a random error, but as a systematic failure mode in high-dimensional latent spaces.
 
 ### The "Overshoot" Phenomenon: A Geometric Perspective
 Why does strong guidance fail? We trace the root cause to the initialization phase (Zero-SNR, $t=1$). 
