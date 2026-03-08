@@ -1,8 +1,8 @@
-torch>=2.0.0
-diffusers>=0.30.0
-transformers>=4.40.0
-accelerate>=0.28.0
+torch>=2.1.0
+diffusers>=0.32.0
+transformers>=4.41.0
+accelerate>=0.30.0
 sentencepiece
 pillow
-numpy
+numpy<2.0.0
 safetensors
