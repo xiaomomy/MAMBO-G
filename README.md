@@ -1,4 +1,4 @@
-# MAMBO-G: Magnitude-Aware Mitigation for Boosted Guidance
+<h1 align="center">MAMBO-G: Magnitude-Aware Mitigation for Boosted Guidance</h1>
 
 <p align="center">
     <a href="https://github.com/huggingface/diffusers/pull/12862">
